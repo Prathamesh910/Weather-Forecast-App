@@ -52,3 +52,80 @@ function clearError() {
 function getWeatherIconUrl(iconCode) {
     return `https://openweathermap.org/img/wn/${iconCode}@2x.png`;
 }
+
+
+async function fetchCurrentWeather(city) {
+    clearError();
+
+
+    // Loading message
+
+    weatherDisplay.innerHTML = `<p class = "text-center text-xl text-gray-500 animate-pulse">
+    Fetching weather for ${city}...
+    </p>
+    
+    `;
+
+    try{
+const url = `${BASE_URL}/weather?q=${city}&appid=${API_KEY}`;
+const response = await fetch(url);
+
+
+
+// Error for city not found
+
+if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || `Could not fetch weather data. Status: ${response.status}`);}
+
+
+const data = await response.json();
+        displayCurrentWeather(data);
+        fetchForecast(data.coord.lat, data.coord.lon); 
+        updateRecentCities(data.name);
+    
+
+
+
+
+
+
+
+    }
+
+
+catch(error){
+    console.error("Fetch current weather error:", error);
+    displayError(error.message);
+}
+
+}
+
+
+
+// fetch extended forecast data 
+
+async function fetchForecast(lat, lon) {
+   try {
+        const url = `${BASE_URL}/forecast?lat=${lat}&lon=${lon}&appid=${API_KEY}`;
+        const response = await fetch(url);
+
+
+
+
+
+        
+        if (!response.ok) {
+            throw new Error(`Could not fetch extended forecast. Status: ${response.status}`);
+        }
+
+
+        const data = await response.json();
+        displayExtendedForecast(data.list); // 3 hour forecast data 
+        
+    } 
+    catch (error) {
+        console.error("Fetch forecast error:", error);
+    displayError("Could not fetch 5-day forecast.");
+    }
+}
