@@ -106,52 +106,61 @@ async function fetchForecast(lat, lon) {
   }
 }
 
+function displayCurrentWeather(data) {
+  const temp = kelvinToUnits(data.main.temp);
+  const description = data.weather[0].description.toUpperCase();
+  const iconCode = data.weather[0].icon;
+  const humidity = data.main.humidity;
+  const windSpeed = data.wind.speed;
+  const weatherCondition = data.weather[0].main.toLowerCase();
 
+  //Custom Weather Alert
+  let alertMessage = "";
+  const tempInC = data.main.temp - 273.15;
+  if (tempInC > 40) {
+    alertMessage =
+      '<p class="text-xl font-semibold text-red-600 mt-4 p-2 bg-red-100 rounded-lg">⚠️ HEAT WAVE ALERT!</p>';
+  }
 
-function displayCurrentWeather(data){
-    const temp = kelvinToUnits(data.main.temp);
-    const description = data.weather[0].description.toUpperCase();
-    const iconCode = data.weather[0].icon;
-    const humidity = data.main.humidity;
-    const windSpeed = data.wind.speed;
-    const weatherCondition = data.weather[0].main.toLowerCase();
+  //Background change
+  const body = document.body;
+  body.classList.remove("bg-rainy", "bg-clear", "bg-clouds");
 
-//Custom Weather Alert
-let alertMessage = '';
-    const tempInC = data.main.temp - 273.15; 
-    if (tempInC > 40) {
-        alertMessage = '<p class="text-xl font-semibold text-red-600 mt-4 p-2 bg-red-100 rounded-lg">⚠️ HEAT WAVE ALERT!</p>';
-    }
+  if (weatherCondition.includes("rain")) {
+    body.classList.add("bg-rainy");
+    body.classList.remove("bg-gray-100");
+  } else if (weatherCondition.includes("clear")) {
+    body.classList.add("bg-clear");
+    body.classList.remove("bg-gray-100");
+  } else if (weatherCondition.includes("clouds")) {
+    body.classList.add("bg-clouds");
+    body.classList.remove("bg-gray-100");
+  } else {
+    body.classList.add("bg-gray-100");
+  }
 
-
-    //Background change
-const body = document.body;
-    body.classList.remove('bg-rainy', 'bg-clear', 'bg-clouds');
-    
-    if (weatherCondition.includes('rain')) {
-        body.classList.add('bg-rainy');
-        body.classList.remove('bg-gray-100'); 
-    } else if (weatherCondition.includes('clear')) {
-        body.classList.add('bg-clear');
-        body.classList.remove('bg-gray-100');
-    } else if (weatherCondition.includes('clouds')) {
-        body.classList.add('bg-clouds');
-        body.classList.remove('bg-gray-100');
-    } else {
-        body.classList.add('bg-gray-100'); 
-    }
-
-
-    weatherDisplay.innerHTML = `
+  weatherDisplay.innerHTML = `
         <div class="flex flex-col items-center">
-            <h2 class="text-5xl font-extrabold text-weather-dark">${data.name}, ${data.sys.country}</h2>
-            <p class="text-lg text-gray-500">${new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</p>
+            <h2 class="text-5xl font-extrabold text-weather-dark">${
+              data.name
+            }, ${data.sys.country}</h2>
+            <p class="text-lg text-gray-500">${new Date().toLocaleDateString(
+              "en-US",
+              { weekday: "long", month: "long", day: "numeric" }
+            )}</p>
             
-            <img src="${getWeatherIconUrl(iconCode)}" alt="${description}" class="w-32 h-32 my-2">
+            <img src="${getWeatherIconUrl(
+              iconCode
+            )}" alt="${description}" class="w-32 h-32 my-2">
             
             <div class="flex items-start">
-                <p id="main-temp" class="text-8xl font-light text-weather-blue">${temp.replace(/°[CF]$/, '')}</p>
-                <span id="temp-unit" class="text-3xl font-light text-weather-blue mt-4">${temp.slice(-2)}</span>
+                <p id="main-temp" class="text-8xl font-light text-weather-blue">${temp.replace(
+                  /°[CF]$/,
+                  ""
+                )}</p>
+                <span id="temp-unit" class="text-3xl font-light text-weather-blue mt-4">${temp.slice(
+                  -2
+                )}</span>
             </div>
 
             <p class="text-2xl font-semibold text-gray-600 mb-6">${description}</p>
@@ -167,12 +176,79 @@ const body = document.body;
                 </div>
                 <div class="p-3 bg-weather-light rounded-lg">
                     <span class="text-sm font-medium text-gray-500">Feels Like</span>
-                    <p class="text-xl font-bold text-weather-dark">${kelvinToUnits(data.main.feels_like)}</p>
+                    <p class="text-xl font-bold text-weather-dark">${kelvinToUnits(
+                      data.main.feels_like
+                    )}</p>
                 </div>
             </div>
             ${alertMessage}
         </div>
     `;
-  
-    updateTempDisplay();
+
+  updateTempDisplay();
+}
+
+// display 5-days forecast
+
+function displayExtendedForecast(list) {
+  const dailyForecasts = {};
+
+  list.forEach((item) => {
+    const data = IIRFilterNode.dt_txt.split(" ")[0]; //yyyy-mm-dd extraction
+
+    if (!dailyForecasts[data]) {
+      dailyForecasts[data] = {
+        temps: [],
+        icons: [],
+        wind: item.wind.speed,
+        humidity: item.main.humidity,
+        timestamp: item.dt * 1000,
+      };
+    }
+
+    dailyForecasts[date].temps.push(item.main.temp); // get all temp for a given day
+
+    if (item.dt_txt.includes("12:00:00") || item.dt_txt.includes("15:00:00")) {
+      dailyForecasts[date].icon = item.weather[0].icon;
+    }
+  });
+
+  // removed todays data cus its on the main card
+  const todayKey = Object.keys(dailyForecasts)[0];
+
+  delete dailyForecasts[todayKey];
+
+  Object.keys(dailyForecasts)
+    .slice(0, 5)
+    .forEach((dateKey) => {
+      const dayData = dailyForecasts[dateKey];
+      const minTemp = Math.min(...dayData.temps);
+      const maxTemp = Math.max(...dayData.temps);
+
+      const cardHTML = `
+            <div class="bg-white p-4 rounded-lg shadow-lg text-center border border-gray-200 hover:shadow-xl transition duration-300">
+                <p class="text-lg font-bold text-weather-dark mb-1">${dayName}</p>
+                <img src="${getWeatherIconUrl(
+                  dayData.icon
+                )}" alt="Weather Icon" class="w-12 h-12 mx-auto">
+                <p class="text-xl font-bold text-weather-blue">
+                    ${kelvinToUnits(maxTemp, true)} / ${kelvinToUnits(
+        minTemp,
+        true
+      )}
+                </p>
+                <div class="mt-2 text-sm text-gray-600">
+                    <p>🌬️ ${dayData.wind} m/s</p>
+                    <p>💧 ${dayData.humidity}%</p>
+                </div>
+            </div>
+        `;
+
+      forecastContainer.insertAdjacentHTML("beforeend", cardHTML);
+    });
+
+  if (Object.keys(dailyForecasts).length > 0) {
+    extendedForecastTitle.classList.remove("hidden");
   }
+}
+
