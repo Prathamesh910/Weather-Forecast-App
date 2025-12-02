@@ -252,3 +252,48 @@ function displayExtendedForecast(list) {
   }
 }
 
+//  Event listeners
+
+function init() {
+  //weather for default coty
+  fetchCurrentWeather(DEAFAULT_CITY);
+
+  //Search input
+  searchInput.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") {
+      searchBtn.click();
+    }
+  });
+
+  //search btn
+
+  searchBtn.addEventListener("click", () => {
+    const city = searchInput.value.trim();
+    if (city) {
+      fetchCurrentWeather(city);
+      searchInput.value = "";
+    } else {
+      displayError("Please enter a city name to search.");
+    }
+  });
+
+  //current location btn
+
+  currentLocationBtn.addEventListener("click", getCurrentLocationWeather);
+
+  //temperature toggle
+
+  tempToggleBtn.addEventListener("click", toggleTemperatureUnit);
+
+  //Recent searchs
+  recentCitiesDropdown.addEventListener("change", (e) => {
+    const city = e.target.value;
+    if (city) {
+      fetchCurrentWeather(city);
+      e.target.value = "";
+    }
+  });
+
+  loadRecentCities();
+}
+init();
