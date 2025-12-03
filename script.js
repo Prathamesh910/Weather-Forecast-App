@@ -343,17 +343,57 @@ fetchCurrentWeather(currentCity);
 }}
 
 
+//Geolocation
+
+function getCurrentLocationWeather() {
+clearError();
+
+if (navigator.geolocation){weatherDisplay.innerHTML = `
+<p class="text-center text-xl text-gray-500 animate-pulse">
+Requesting location...
+</p>
+ `;
+navigator.geolocation.getCurrentPosition(
 
 
+position => {
+const { latitude, longitude } = position.coords;
 
+fetchWeatherByCoords(latitude, longitude);},
 
+error => {
+let errorMessage = "Unable to retrive your location.";
+if (error.code === error.PERMISSION_DENIED) {
+errorMessage += "Enable location permission.";
+}
+displayError(errorMessage);}
+);
+} else {
+displayError("Geolocation is not supported on your current browser.");
+}
+}
 
+async function fetchWeatherByCoords(lat, lon) {
+clearError();
+weatherDisplay.innerHTML = `
+<p class="text-center text-xl text-gray-500 animate-pulse">
+Fetching weather for your location...
+</p>
+`;
 
-
-
-
-
-
-
-
-
+try {
+const url = `${BASE_URL}/weather?lat=${lat}&lon=${lon}&appid=${API_KEY}`;
+const response = await fetch(url);
+if (!response.ok) {
+throw new Error(`Unable to fetch weather data for coordinates. Status: ${response.status}`);
+}
+const data = await response.json();
+displayCurrentWeather(data);
+fetchForecast(lat, lon);
+updateRecentCities(data.name);
+    
+} catch (error) {
+console.error("Fetch weather by coords error:", error);
+displayError(error.message);
+}
+}
