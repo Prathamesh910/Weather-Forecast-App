@@ -2,7 +2,7 @@
 
 const API_KEY = "253527e6bb138d2127973c8361ebda7b";
 const BASE_URL = "https://api.openweathermap.org/data/2.5";
-const DEAFAULT_CITY = "Mumbai"; // Starting city
+const DEFAULT_CITY = "Mumbai"; // Starting city
 
 let isCelsius = true;
 let recentCities = []; // Array to store recent city searches
@@ -11,7 +11,9 @@ let recentCities = []; // Array to store recent city searches
 const searchInput = document.getElementById("city-search");
 const searchBtn = document.getElementById("search-btn");
 const currentLocationBtn = document.getElementById("current-location-btn");
-const tempToggleBtn = document.getElementById("temp-toggle-btn");
+const celsiusLabel = document.getElementById('celsius-label');
+const fahrenheitLabel = document.getElementById('fahrenheit-label');
+const tempToggleSwitch = document.getElementById('temp-toggle-switch');
 const weatherDisplay = document.getElementById("current-weather-display");
 const forecastContainer = document.getElementById("forecast-cards-container");
 const errorDisplay = document.getElementById("error-display");
@@ -78,6 +80,11 @@ async function fetchCurrentWeather(city) {
     const data = await response.json();
     displayCurrentWeather(data);
     fetchForecast(data.coord.lat, data.coord.lon);
+
+
+
+
+    
     updateRecentCities(data.name);
   } catch (error) {
     console.error("Fetch current weather error:", error);
@@ -185,19 +192,34 @@ function displayCurrentWeather(data) {
         </div>
     `;
 
-  updateTempDisplay();
+  
 }
 
+
+
+function updateToggleLabels() {
+    if (isCelsius) {
+        celsiusLabel.classList.add('text-weather-blue'); 
+        fahrenheitLabel.classList.remove('text-weather-blue');
+        fahrenheitLabel.classList.add('text-gray-400'); 
+    } else {
+        fahrenheitLabel.classList.add('text-weather-blue');
+        celsiusLabel.classList.remove('text-weather-blue');
+        celsiusLabel.classList.add('text-gray-400');
+    }
+    
+    tempToggleSwitch.checked = !isCelsius; 
+}
 // display 5-days forecast
 
 function displayExtendedForecast(list) {
   const dailyForecasts = {};
 
   list.forEach((item) => {
-    const data = IIRFilterNode.dt_txt.split(" ")[0]; //yyyy-mm-dd extraction
+    const date = item.dt_txt.split(" ")[0]; //yyyy-mm-dd extraction
 
-    if (!dailyForecasts[data]) {
-      dailyForecasts[data] = {
+    if (!dailyForecasts[date]) {
+      dailyForecasts[date] = {
         temps: [],
         icons: [],
         wind: item.wind.speed,
@@ -218,12 +240,18 @@ function displayExtendedForecast(list) {
 
   delete dailyForecasts[todayKey];
 
+  forecastContainer.innerHTML = "";
+
   Object.keys(dailyForecasts)
     .slice(0, 5)
     .forEach((dateKey) => {
       const dayData = dailyForecasts[dateKey];
       const minTemp = Math.min(...dayData.temps);
       const maxTemp = Math.max(...dayData.temps);
+
+
+      const dateObj = new Date(dayData.timestamp);
+    const dayName = dateObj.toLocaleDateString('en-US', { weekday: 'short' });
 
       const cardHTML = `
             <div class="bg-white p-4 rounded-lg shadow-lg text-center border border-gray-200 hover:shadow-xl transition duration-300">
@@ -232,11 +260,8 @@ function displayExtendedForecast(list) {
                   dayData.icon
                 )}" alt="Weather Icon" class="w-12 h-12 mx-auto">
                 <p class="text-xl font-bold text-weather-blue">
-                    ${kelvinToUnits(maxTemp, true)} / ${kelvinToUnits(
-        minTemp,
-        true
-      )}
-                </p>
+                ${kelvinToUnits(maxTemp)} / ${kelvinToUnits(minTemp)} </p>
+
                 <div class="mt-2 text-sm text-gray-600">
                     <p>🌬️ ${dayData.wind} m/s</p>
                     <p>💧 ${dayData.humidity}%</p>
@@ -255,8 +280,9 @@ function displayExtendedForecast(list) {
 //  Event listeners
 
 function init() {
+  updateToggleLabels();
   //weather for default coty
-  fetchCurrentWeather(DEAFAULT_CITY);
+  fetchCurrentWeather(DEFAULT_CITY);
 
   //Search input
   searchInput.addEventListener("keypress", (e) => {
@@ -273,7 +299,7 @@ function init() {
       fetchCurrentWeather(city);
       searchInput.value = "";
     } else {
-      displayError("Please enter a city name to search.");
+      displayError("Please enter a city name...");
     }
   });
 
@@ -283,7 +309,7 @@ function init() {
 
   //temperature toggle
 
-  tempToggleBtn.addEventListener("click", toggleTemperatureUnit);
+  tempToggleSwitch.addEventListener('change', toggleTemperatureUnit);
 
   //Recent searchs
   recentCitiesDropdown.addEventListener("change", (e) => {
@@ -297,3 +323,37 @@ function init() {
   loadRecentCities();
 }
 init();
+
+
+
+//Temperature Toggle
+
+function toggleTemperatureUnit(){
+  isCelsius = !isCelsius;
+updateToggleLabels();
+
+
+
+const cityElement = weatherDisplay.querySelector('h2');
+
+if (cityElement) {
+
+const currentCity = cityElement.textContent.split(',')[0].trim();
+fetchCurrentWeather(currentCity);
+}}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
