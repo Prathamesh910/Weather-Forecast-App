@@ -17,8 +17,7 @@ Follow these steps to set up and run the project locally.
 ### 1. Download and Extract the Project
 
 ```bash
-# Clone the repository to your local machine
-git clone [Your GitHub Repository URL Here]
+git clone https://github.com/Prathamesh910/Weather-Forecast-App.git
 ```
 
 ### 2. Obtain an API Key
@@ -42,10 +41,7 @@ To run the project replace this value with your own active OpenWeatherMap API Ke
 
 Once the key is updated, simply open the **index.html** file in any web browser to run the application.
 
-```bash
-# Open the file directly from your operating system's file explorer.
-open index.html
-```
+
 
 ## Usage Guide
 
@@ -78,8 +74,11 @@ To switch between **Celsius (°C)** and **Fahrenheit (°F)**, use the toggle swi
 
 **Font Awesome**
 
-## Authors
 
-- Prathamesh Giradkar
+## Github Repo Link
 
 - [GitHub](https://github.com/Prathamesh910)
+
+## Live Project demo Link
+
+- [Live Project demo]()

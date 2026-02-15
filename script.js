@@ -1,6 +1,6 @@
 // console.log("Weather Forecast App is running...");
 
-const API_KEY = "253527e6bb138d2127973c8361ebda7b";
+const API_KEY = "9062448c98008fa7e62324b7025422b1";
 const BASE_URL = "https://api.openweathermap.org/data/2.5";
 const DEFAULT_CITY = "Mumbai"; // Starting city
 
@@ -18,9 +18,7 @@ const weatherDisplay = document.getElementById("current-weather-display");
 const forecastContainer = document.getElementById("forecast-cards-container");
 const errorDisplay = document.getElementById("error-display");
 const recentCitiesDropdown = document.getElementById("recent-cities-dropdown");
-const extendedForecastTitle = document.getElementById(
-  "extended-forecast-title"
-);
+const extendedForecastTitle = document.getElementById("extended-forecast-title");
 
 // Kelvin - Celsius converter
 function kelvinToUnits(kelvin) {
