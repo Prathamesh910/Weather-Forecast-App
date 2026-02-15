@@ -77,8 +77,8 @@ To switch between **Celsius (°C)** and **Fahrenheit (°F)**, use the toggle swi
 
 ## Github Repo Link
 
-- [GitHub](https://github.com/Prathamesh910)
+- [GitHub](https://github.com/Prathamesh910/Weather-Forecast-App)
 
 ## Live Project demo Link
 
-- [Live Project demo]()
+- [Live Project demo](https://weather-forecast-app-ecru-alpha.vercel.app)
