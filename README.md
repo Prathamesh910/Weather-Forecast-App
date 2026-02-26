@@ -2,6 +2,11 @@
 
 It is a modern, responsive web application designed to provide **real-time and accurate weather forecasts** for any location worldwide. It implements all specified features, including current conditions, a 5-day's extended forecast, and a user-friendly search interface.
 
+## Live Project demo Link
+
+- [Live Project demo](https://weather-forecast-app-ecru-alpha.vercel.app)
+
+
 ## Features
 
 - Current Weather Conditions
@@ -79,6 +84,3 @@ To switch between **Celsius (°C)** and **Fahrenheit (°F)**, use the toggle swi
 
 - [GitHub](https://github.com/Prathamesh910/Weather-Forecast-App)
 
-## Live Project demo Link
-
-- [Live Project demo](https://weather-forecast-app-ecru-alpha.vercel.app)
